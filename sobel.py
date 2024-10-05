@@ -8,8 +8,11 @@ def sobel_sharpening(img : np.ndarray) -> np.ndarray:
 
     img_sobel_1 = conv2d_sharpening(img, kernel_sobel_vertical)
     img_sobel_2 = conv2d_sharpening(img, kernel_sobel_horizontal)
+
+    sobel = np.hypot(img_sobel_1, img_sobel_2)
+    sobel = np.clip(sobel / np.max(sobel) * 255, 0, 255).astype(np.uint8)
     
-    return np.hypot(img_sobel_1, img_sobel_2)
+    return sobel
 
 # Somente para debug
 def sobel_sharpening_optmized(img : np.ndarray) -> np.ndarray:
