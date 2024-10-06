@@ -1,4 +1,4 @@
-# /Spatial-VS-FreqDomain
+# Spatial-VS-FreqDomain
 
 Implementation of an image processing exercise to analyse the results of using spacial filtering and frequency domain filtering.
 
