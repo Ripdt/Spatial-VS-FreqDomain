@@ -36,7 +36,6 @@ initial_time = time()
 img_gauss = gauss_filter(img)
 final_time = time()
 gauss_time = final_time - initial_time
-print(gauss_time)
 show_and_save_img(img_gauss, filename='gauss')
 
 # ========= Filtros Passa-baixa ==========
