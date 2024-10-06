@@ -12,6 +12,8 @@ from os import mkdir
 from os.path import exists
 from shutil import rmtree
 
+from time import time
+
 # Criação do diretório de saída
 directory = './out'
 if exists(directory):
@@ -30,29 +32,53 @@ img = cv2.imread('res/lena.png', cv2.IMREAD_GRAYSCALE)
 show_and_save_img(img, filename='no-modification')
 
 # ========= Filtro Gaussiano ==========
+initial_time = time()
 img_gauss = gauss_filter(img)
+final_time = time()
+gauss_time = final_time - initial_time
+print(gauss_time)
 show_and_save_img(img_gauss, filename='gauss')
 
 # ========= Filtros Passa-baixa ==========
 radius = 60
+initial_time = time()
 img_lp_ideal = low_pass_filter(img=img, radius=radius, lpType=0)  # Passa-baixa ideal
+final_time = time()
+lp_ideal_time = final_time - initial_time
+
+initial_time = time()
 img_lp_gauss = low_pass_filter(img=img, radius=radius, lpType=1)  # Passa-baixa gaussiano
+final_time = time()
+lp_gauss_time = final_time - initial_time
 
 show_and_save_img(img_lp_ideal, filename='lp-ideal')
 show_and_save_img(img_lp_gauss, filename='lp-gauss')
 
 # ========= Filtro Sobel ==========
+initial_time = time()
 img_sobel = sobel_sharpening(img)
+final_time = time()
+sobel_time = final_time - initial_time
 show_and_save_img(img_sobel, filename='sobel')
 
 # ========= Filtro Canny ==========
+initial_time = time()
 img_canny = canny_edge_detection(img, 50, 100)
+final_time = time()
+canny_time = final_time - initial_time
 show_and_save_img(img_canny, filename='canny')
 
 # ========= Filtros Passa-alta ==========
 radius = 120
+initial_time = time()
 img_hp_ideal = high_pass_filter(img=img, radius=radius, lpType=0)  # Passa-alta ideal
+final_time = time()
+hp_ideal_time = final_time - initial_time
+
+initial_time = time()
 img_hp_gauss = high_pass_filter(img=img, radius=radius, lpType=1)  # Passa-alta gaussiano
+final_time = time()
+hp_gauss_time = final_time - initial_time
 
 show_and_save_img(img_hp_ideal, filename='hp-ideal')
 show_and_save_img(img_hp_gauss, filename='hp-gauss')
@@ -102,4 +128,13 @@ print("\n")
 # Comparação: Passa-alta Gaussiano com Canny
 print("Comparação: Passa-alta Gaussiano com Canny")
 print(f"Passa-alta Gaussiano vs Canny - PSNR: {hp_gauss_canny_psnr}, RMSE: {hp_gauss_canny_rmse}, MSE: {hp_gauss_canny_mse}")
-  
+print("\n")
+
+print("Tempos de execução")
+print(f"\tGaussiano: {gauss_time} segundos")
+print(f"\tPassa-baixa Ideal: {lp_ideal_time} segundos")
+print(f"\tPassa-baixa Gaussiano: {lp_gauss_time} segundos")
+print("")
+print(f"\tSobel: {sobel_time} segundos")
+print(f"\tPassa-alta Ideal: {hp_ideal_time} segundos")
+print(f"\tPassa-alta Gaussiano: {hp_gauss_time} segundos")
