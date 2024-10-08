@@ -1,15 +1,28 @@
 import numpy as np
 import cv2
+from sobel import sobel_sharpening
+from convolution import conv2d_sharpening
+from gauss import gauss_filter
 
-def canny_edge_detection(img: np.ndarray, low_threshold: int, high_threshold: int) -> np.ndarray:
-    img_blurred = cv2.GaussianBlur(img, (5, 5), 1.4)
+def canny_edge_detection(img: np.ndarray, low_threshold: int, high_threshold: int, magnitude_scale: float = 1.0) -> np.ndarray:
+    img_blurred = gauss_filter(img, padding=True)
 
-    grad_x = cv2.Sobel(img_blurred, cv2.CV_64F, 1, 0, ksize=3)
-    grad_y = cv2.Sobel(img_blurred, cv2.CV_64F, 0, 1, ksize=3)
-    magnitude = np.sqrt(grad_x**2 + grad_y**2)
+    # Função sobel_sharpening para calcular a magnitude dos gradientes
+    magnitude = sobel_sharpening(img_blurred)
+
+    # Escalar a magnitude para ajustar a sensibilidade
+    magnitude = np.clip(magnitude * magnitude_scale, 0, 255)
+
+    # Cálculo dos gradientes para obter os ângulos
+    kernel_sobel_vertical = np.array(([-1,-2,-1],[0,0,0],[1,2,1]))
+    kernel_sobel_horizontal = np.array(([-1,0,1],[-2,0,2],[-1,0,1]))
+
+    grad_x = conv2d_sharpening(img_blurred, kernel_sobel_horizontal)
+    grad_y = conv2d_sharpening(img_blurred, kernel_sobel_vertical)
+
     angle = np.arctan2(grad_y, grad_x) * (180 / np.pi) % 180
 
-    #Non-maximum Suppression
+    # Non-maximum Suppression
     nms = np.zeros_like(magnitude, dtype=np.uint8)
     img_height, img_width = img.shape
     for i in range(1, img_height - 1):
@@ -29,11 +42,11 @@ def canny_edge_detection(img: np.ndarray, low_threshold: int, high_threshold: in
             if magnitude[i, j] >= max(neighbors):
                 nms[i, j] = magnitude[i, j]
 
-    #Double Threshold
+    # Double Threshold
     strong_edges = (nms > high_threshold).astype(np.uint8)
     weak_edges = ((nms >= low_threshold) & (nms <= high_threshold)).astype(np.uint8)
 
-    #Hysteresis
+    # Hysteresis
     edges = np.zeros_like(img, dtype=np.uint8)
     strong_i, strong_j = np.where(strong_edges == 1)
     weak_i, weak_j = np.where(weak_edges == 1)
@@ -49,7 +62,7 @@ def canny_edge_detection(img: np.ndarray, low_threshold: int, high_threshold: in
 if __name__ == '__main__':
     img = cv2.imread('res/lena.png', cv2.IMREAD_GRAYSCALE)
     
-    edges = canny_edge_detection(img, low_threshold=50, high_threshold=150)
+    edges = canny_edge_detection1(img, low_threshold=50, high_threshold=150)
     
     cv2.imshow('Canny Edge Detection', edges)
     cv2.waitKey(0)

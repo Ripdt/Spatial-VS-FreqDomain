@@ -62,7 +62,7 @@ show_and_save_img(img_sobel, filename='sobel')
 
 # ========= Filtro Canny ==========
 initial_time = time()
-img_canny = canny_edge_detection(img, 50, 100)
+img_canny = canny_edge_detection(img, 15, 50)
 final_time = time()
 canny_time = final_time - initial_time
 show_and_save_img(img_canny, filename='canny')
